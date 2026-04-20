@@ -378,7 +378,7 @@ export default function Settings() {
                   </Field>
                   <div>
                     <span className="pk-label block mb-1">Environment</span>
-                    <Segment
+                    <Segment<"live" | "test">
                       value={env}
                       onChange={setEnv}
                       options={[
