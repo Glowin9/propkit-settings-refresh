@@ -185,7 +185,9 @@ const CURRENCIES = [
 
 export default function Settings() {
   // UI-only state. All saves/removes are wired to stub handlers.
-  const [provider] = useState("Deribit");
+  const [tab, setTab] = useState<"api" | "security">("api");
+  const [provider, setProvider] = useState("Deribit");
+  const providers = ["Deribit"]; // saved providers shown as chips
   const [apiEnabled, setApiEnabled] = useState(true);
   const [env, setEnv] = useState<"live" | "test">("live");
   const [selectedCcy, setSelectedCcy] = useState<string[]>(["ETH"]);
