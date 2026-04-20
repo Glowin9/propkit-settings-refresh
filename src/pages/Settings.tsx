@@ -616,6 +616,116 @@ export default function Settings() {
             </Card>
           </div>
         </div>
+        )}
+
+        {/* Security tab */}
+        {tab === "security" && (
+          <div className="grid grid-cols-12 gap-3">
+            <Card
+              title="Security"
+              icon={ShieldCheck}
+              className="col-span-12 lg:col-span-8"
+              right={
+                <div className="flex items-center gap-1.5">
+                  <span className="pk-chip pk-chip-success">aal2</span>
+                  <span className="pk-chip pk-chip-warn">Local unlock</span>
+                </div>
+              }
+            >
+              <p className="pk-helper mb-3">
+                Manage MFA factors, the local unlock code, and the protected secret layer for
+                this device. Sensitive actions still require AAL2.
+              </p>
+
+              {/* MFA */}
+              <div className="rounded-md border border-border bg-secondary/30 p-2.5 mb-2">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <Smartphone className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-[12px] font-semibold">MFA (TOTP)</span>
+                  </div>
+                  <span className="pk-chip pk-chip-success">1 verified</span>
+                </div>
+                <div className="pk-helper mb-2">
+                  Authenticator-app factor enrolled. Required for credential edits.
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  <BtnGhost onClick={noop}>
+                    <Plus className="h-3.5 w-3.5" />
+                    Enroll factor
+                  </BtnGhost>
+                  <BtnGhost onClick={noop}>
+                    <RefreshCw className="h-3.5 w-3.5" />
+                    Refresh MFA state
+                  </BtnGhost>
+                </div>
+              </div>
+
+              {/* Local unlock */}
+              <div className="rounded-md border border-border bg-secondary/30 p-2.5 mb-2">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-[12px] font-semibold">Local unlock code</span>
+                  </div>
+                  <span className="pk-chip pk-chip-warn">Not configured</span>
+                </div>
+                <div className="pk-helper mb-2">
+                  Protects locally stored exchange &amp; proxy secrets. Min 10 chars, 1 letter, 1 digit.
+                </div>
+                <div className="grid grid-cols-2 gap-2 mb-2">
+                  <Input type="password" autoComplete="new-password" placeholder="New code" />
+                  <Input type="password" autoComplete="new-password" placeholder="Confirm" />
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  <BtnPrimary onClick={noop}>
+                    <Lock className="h-3.5 w-3.5" />
+                    Set unlock code
+                  </BtnPrimary>
+                  <BtnGhost onClick={noop}>
+                    <RefreshCw className="h-3.5 w-3.5" />
+                    Refresh state
+                  </BtnGhost>
+                </div>
+              </div>
+
+              {/* Reset secret layer */}
+              <div className="rounded-md border border-[hsl(var(--destructive)/0.3)] bg-[hsl(var(--destructive)/0.05)] p-2.5">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
+                  <span className="text-[12px] font-semibold text-destructive">
+                    Reset protected secret layer
+                  </span>
+                </div>
+                <div className="pk-helper mb-2">
+                  Clears stored exchange &amp; proxy credentials for this device only. Auth, MFA, and
+                  business data remain intact. Unrecoverable.
+                </div>
+                <BtnGhost
+                  onClick={noop}
+                  className="border-[hsl(var(--destructive)/0.4)] text-destructive hover:bg-[hsl(var(--destructive)/0.1)] hover:text-destructive"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Reset secret layer
+                </BtnGhost>
+              </div>
+            </Card>
+
+            <Card
+              title="Posture"
+              icon={ShieldCheck}
+              className="col-span-12 lg:col-span-4"
+            >
+              <div className="divide-y divide-border/60">
+                <div className="pk-kv"><span>Assurance level</span><span>aal2</span></div>
+                <div className="pk-kv"><span>Verified factors</span><span>1</span></div>
+                <div className="pk-kv"><span>Local unlock</span><span>Not configured</span></div>
+                <div className="pk-kv"><span>Last MFA refresh</span><span>13:18:04</span></div>
+                <div className="pk-kv"><span>Protected scope</span><span>Local secret vault</span></div>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     </AppShell>
   );
