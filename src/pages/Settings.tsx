@@ -244,31 +244,65 @@ export default function Settings() {
           </div>
         </header>
 
-        {/* Provider selector row (compact filter-style, like Trade History) */}
+        {/* Settings tabs (API / Security) */}
         <div className="flex flex-wrap items-center gap-2 mb-3">
-          <div className="flex items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1">
-            <span className="pk-label">API</span>
-            <button className="inline-flex items-center gap-1 text-[12px] font-semibold text-foreground">
-              {provider}
-              <ChevronDown className="h-3 w-3 text-muted-foreground" />
+          <div className="pk-segment" role="tablist">
+            <button
+              role="tab"
+              aria-selected={tab === "api"}
+              data-active={tab === "api"}
+              onClick={() => setTab("api")}
+              className="inline-flex items-center gap-1.5"
+            >
+              <Workflow className="h-3 w-3" />
+              API
+            </button>
+            <button
+              role="tab"
+              aria-selected={tab === "security"}
+              data-active={tab === "security"}
+              onClick={() => setTab("security")}
+              className="inline-flex items-center gap-1.5"
+            >
+              <ShieldCheck className="h-3 w-3" />
+              Security
             </button>
           </div>
-          <BtnGhost aria-label="Add provider">
-            <Plus className="h-3.5 w-3.5" />
-            Add
-          </BtnGhost>
-          <BtnGhost>
-            <Workflow className="h-3.5 w-3.5" />
-            Profiles & routes
-          </BtnGhost>
-          <span className="pk-helper hidden md:inline ml-1">
-            Each profile stores its own keys, secrets, scope and writes trades to its own table lane.
-          </span>
-          <div className="ml-auto flex items-center gap-2">
-            <span className="pk-label">API status</span>
-            <Toggle checked={apiEnabled} onChange={setApiEnabled} label="API status" />
-          </div>
+
+          {tab === "api" && (
+            <div className="ml-auto flex items-center gap-2">
+              <span className="pk-label">API status</span>
+              <Toggle checked={apiEnabled} onChange={setApiEnabled} label="API status" />
+            </div>
+          )}
         </div>
+
+        {/* Provider chip strip — visible only on API tab */}
+        {tab === "api" && (
+          <div className="flex flex-wrap items-center gap-1.5 mb-3 rounded-md border border-border bg-card/60 px-2 py-1.5">
+            {providers.map((p) => (
+              <button
+                key={p}
+                data-active={provider === p}
+                onClick={() => setProvider(p)}
+                className="pk-pill"
+              >
+                {p}
+              </button>
+            ))}
+            <button
+              onClick={noop}
+              className="pk-pill border-dashed text-muted-foreground"
+              aria-label="Add provider"
+            >
+              <Plus className="h-3 w-3" />
+              Add
+            </button>
+            <span className="pk-helper hidden md:inline ml-2">
+              Each profile stores its own keys, secrets, scope and writes trades to its own table lane.
+            </span>
+          </div>
+        )}
 
         {/* Main grid */}
         <div className="grid grid-cols-12 gap-3">
