@@ -18,8 +18,11 @@ import {
   Stethoscope,
   ChevronDown,
   Info,
+  Lock,
+  Smartphone,
+  AlertTriangle,
 } from "lucide-react";
-import { AppShell, TopUser } from "@/components/AppShell";
+import { AppShell } from "@/components/AppShell";
 import { cn } from "@/lib/utils";
 
 /* ---------- presentational helpers (UI only, no business logic) ---------- */
@@ -232,7 +235,10 @@ export default function Settings() {
               <Activity className="h-3 w-3" />
               Sync ready
             </span>
-            <TopUser />
+            <span className="pk-chip pk-chip-success">
+              <ShieldCheck className="h-3 w-3" />
+              MFA aal2
+            </span>
           </div>
         </header>
 
@@ -322,14 +328,6 @@ export default function Settings() {
                 <BtnGhost onClick={noop}>
                   <Trash2 className="h-3.5 w-3.5" />
                   Remove saved
-                </BtnGhost>
-                <BtnGhost onClick={noop}>
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  Open security settings
-                </BtnGhost>
-                <BtnGhost onClick={noop}>
-                  <RefreshCw className="h-3.5 w-3.5" />
-                  Refresh state
                 </BtnGhost>
               </div>
             </Card>
