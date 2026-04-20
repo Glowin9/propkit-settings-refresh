@@ -185,7 +185,9 @@ const CURRENCIES = [
 
 export default function Settings() {
   // UI-only state. All saves/removes are wired to stub handlers.
-  const [provider] = useState("Deribit");
+  const [tab, setTab] = useState<"api" | "security">("api");
+  const [provider, setProvider] = useState("Deribit");
+  const providers = ["Deribit"]; // saved providers shown as chips
   const [apiEnabled, setApiEnabled] = useState(true);
   const [env, setEnv] = useState<"live" | "test">("live");
   const [selectedCcy, setSelectedCcy] = useState<string[]>(["ETH"]);
@@ -242,33 +244,68 @@ export default function Settings() {
           </div>
         </header>
 
-        {/* Provider selector row (compact filter-style, like Trade History) */}
+        {/* Settings tabs (API / Security) */}
         <div className="flex flex-wrap items-center gap-2 mb-3">
-          <div className="flex items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1">
-            <span className="pk-label">API</span>
-            <button className="inline-flex items-center gap-1 text-[12px] font-semibold text-foreground">
-              {provider}
-              <ChevronDown className="h-3 w-3 text-muted-foreground" />
+          <div className="pk-segment" role="tablist">
+            <button
+              role="tab"
+              aria-selected={tab === "api"}
+              data-active={tab === "api"}
+              onClick={() => setTab("api")}
+              className="inline-flex items-center gap-1.5"
+            >
+              <Workflow className="h-3 w-3" />
+              API
+            </button>
+            <button
+              role="tab"
+              aria-selected={tab === "security"}
+              data-active={tab === "security"}
+              onClick={() => setTab("security")}
+              className="inline-flex items-center gap-1.5"
+            >
+              <ShieldCheck className="h-3 w-3" />
+              Security
             </button>
           </div>
-          <BtnGhost aria-label="Add provider">
-            <Plus className="h-3.5 w-3.5" />
-            Add
-          </BtnGhost>
-          <BtnGhost>
-            <Workflow className="h-3.5 w-3.5" />
-            Profiles & routes
-          </BtnGhost>
-          <span className="pk-helper hidden md:inline ml-1">
-            Each profile stores its own keys, secrets, scope and writes trades to its own table lane.
-          </span>
-          <div className="ml-auto flex items-center gap-2">
-            <span className="pk-label">API status</span>
-            <Toggle checked={apiEnabled} onChange={setApiEnabled} label="API status" />
-          </div>
+
+          {tab === "api" && (
+            <div className="ml-auto flex items-center gap-2">
+              <span className="pk-label">API status</span>
+              <Toggle checked={apiEnabled} onChange={setApiEnabled} label="API status" />
+            </div>
+          )}
         </div>
 
-        {/* Main grid */}
+        {/* Provider chip strip — visible only on API tab */}
+        {tab === "api" && (
+          <div className="flex flex-wrap items-center gap-1.5 mb-3 rounded-md border border-border bg-card/60 px-2 py-1.5">
+            {providers.map((p) => (
+              <button
+                key={p}
+                data-active={provider === p}
+                onClick={() => setProvider(p)}
+                className="pk-pill"
+              >
+                {p}
+              </button>
+            ))}
+            <button
+              onClick={noop}
+              className="pk-pill border-dashed text-muted-foreground"
+              aria-label="Add provider"
+            >
+              <Plus className="h-3 w-3" />
+              Add
+            </button>
+            <span className="pk-helper hidden md:inline ml-2">
+              Each profile stores its own keys, secrets, scope and writes trades to its own table lane.
+            </span>
+          </div>
+        )}
+
+        {/* Main grid — API tab */}
+        {tab === "api" && (
         <div className="grid grid-cols-12 gap-3">
           {/* LEFT (8 cols) */}
           <div className="col-span-12 lg:col-span-8 space-y-3">
@@ -450,96 +487,6 @@ export default function Settings() {
 
           {/* RIGHT (4 cols) */}
           <div className="col-span-12 lg:col-span-4 space-y-3">
-            {/* Security — moved out of the right-side sheet into its own settings block */}
-            <Card
-              title="Security"
-              icon={ShieldCheck}
-              right={
-                <div className="flex items-center gap-1.5">
-                  <span className="pk-chip pk-chip-success">aal2</span>
-                  <span className="pk-chip pk-chip-warn">Local unlock</span>
-                </div>
-              }
-            >
-              <p className="pk-helper mb-3">
-                Manage MFA factors, the local unlock code, and the protected secret layer for
-                this device. Sensitive actions still require AAL2.
-              </p>
-
-              {/* MFA row */}
-              <div className="rounded-md border border-border bg-secondary/30 p-2.5 mb-2">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1.5">
-                    <Smartphone className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-[12px] font-semibold">MFA (TOTP)</span>
-                  </div>
-                  <span className="pk-chip pk-chip-success">1 verified</span>
-                </div>
-                <div className="pk-helper mb-2">
-                  Authenticator-app factor enrolled. Required for credential edits.
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  <BtnGhost onClick={noop}>
-                    <Plus className="h-3.5 w-3.5" />
-                    Enroll factor
-                  </BtnGhost>
-                  <BtnGhost onClick={noop}>
-                    <RefreshCw className="h-3.5 w-3.5" />
-                    Refresh MFA state
-                  </BtnGhost>
-                </div>
-              </div>
-
-              {/* Local unlock row */}
-              <div className="rounded-md border border-border bg-secondary/30 p-2.5 mb-2">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1.5">
-                    <Lock className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-[12px] font-semibold">Local unlock code</span>
-                  </div>
-                  <span className="pk-chip pk-chip-warn">Not configured</span>
-                </div>
-                <div className="pk-helper mb-2">
-                  Protects locally stored exchange &amp; proxy secrets. Min 10 chars, 1 letter, 1 digit.
-                </div>
-                <div className="grid grid-cols-2 gap-2 mb-2">
-                  <Input type="password" autoComplete="new-password" placeholder="New code" />
-                  <Input type="password" autoComplete="new-password" placeholder="Confirm" />
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  <BtnPrimary onClick={noop}>
-                    <Lock className="h-3.5 w-3.5" />
-                    Set unlock code
-                  </BtnPrimary>
-                  <BtnGhost onClick={noop}>
-                    <RefreshCw className="h-3.5 w-3.5" />
-                    Refresh state
-                  </BtnGhost>
-                </div>
-              </div>
-
-              {/* Reset protected secret layer */}
-              <div className="rounded-md border border-[hsl(var(--destructive)/0.3)] bg-[hsl(var(--destructive)/0.05)] p-2.5">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
-                  <span className="text-[12px] font-semibold text-destructive">
-                    Reset protected secret layer
-                  </span>
-                </div>
-                <div className="pk-helper mb-2">
-                  Clears stored exchange &amp; proxy credentials for this device only. Auth, MFA, and
-                  business data remain intact. Unrecoverable.
-                </div>
-                <BtnGhost
-                  onClick={noop}
-                  className="border-[hsl(var(--destructive)/0.4)] text-destructive hover:bg-[hsl(var(--destructive)/0.1)] hover:text-destructive"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  Reset secret layer
-                </BtnGhost>
-              </div>
-            </Card>
-
             <Card
               title="Proxy configuration"
               icon={Server}
@@ -669,6 +616,116 @@ export default function Settings() {
             </Card>
           </div>
         </div>
+        )}
+
+        {/* Security tab */}
+        {tab === "security" && (
+          <div className="grid grid-cols-12 gap-3">
+            <Card
+              title="Security"
+              icon={ShieldCheck}
+              className="col-span-12 lg:col-span-8"
+              right={
+                <div className="flex items-center gap-1.5">
+                  <span className="pk-chip pk-chip-success">aal2</span>
+                  <span className="pk-chip pk-chip-warn">Local unlock</span>
+                </div>
+              }
+            >
+              <p className="pk-helper mb-3">
+                Manage MFA factors, the local unlock code, and the protected secret layer for
+                this device. Sensitive actions still require AAL2.
+              </p>
+
+              {/* MFA */}
+              <div className="rounded-md border border-border bg-secondary/30 p-2.5 mb-2">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <Smartphone className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-[12px] font-semibold">MFA (TOTP)</span>
+                  </div>
+                  <span className="pk-chip pk-chip-success">1 verified</span>
+                </div>
+                <div className="pk-helper mb-2">
+                  Authenticator-app factor enrolled. Required for credential edits.
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  <BtnGhost onClick={noop}>
+                    <Plus className="h-3.5 w-3.5" />
+                    Enroll factor
+                  </BtnGhost>
+                  <BtnGhost onClick={noop}>
+                    <RefreshCw className="h-3.5 w-3.5" />
+                    Refresh MFA state
+                  </BtnGhost>
+                </div>
+              </div>
+
+              {/* Local unlock */}
+              <div className="rounded-md border border-border bg-secondary/30 p-2.5 mb-2">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-[12px] font-semibold">Local unlock code</span>
+                  </div>
+                  <span className="pk-chip pk-chip-warn">Not configured</span>
+                </div>
+                <div className="pk-helper mb-2">
+                  Protects locally stored exchange &amp; proxy secrets. Min 10 chars, 1 letter, 1 digit.
+                </div>
+                <div className="grid grid-cols-2 gap-2 mb-2">
+                  <Input type="password" autoComplete="new-password" placeholder="New code" />
+                  <Input type="password" autoComplete="new-password" placeholder="Confirm" />
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  <BtnPrimary onClick={noop}>
+                    <Lock className="h-3.5 w-3.5" />
+                    Set unlock code
+                  </BtnPrimary>
+                  <BtnGhost onClick={noop}>
+                    <RefreshCw className="h-3.5 w-3.5" />
+                    Refresh state
+                  </BtnGhost>
+                </div>
+              </div>
+
+              {/* Reset secret layer */}
+              <div className="rounded-md border border-[hsl(var(--destructive)/0.3)] bg-[hsl(var(--destructive)/0.05)] p-2.5">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
+                  <span className="text-[12px] font-semibold text-destructive">
+                    Reset protected secret layer
+                  </span>
+                </div>
+                <div className="pk-helper mb-2">
+                  Clears stored exchange &amp; proxy credentials for this device only. Auth, MFA, and
+                  business data remain intact. Unrecoverable.
+                </div>
+                <BtnGhost
+                  onClick={noop}
+                  className="border-[hsl(var(--destructive)/0.4)] text-destructive hover:bg-[hsl(var(--destructive)/0.1)] hover:text-destructive"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Reset secret layer
+                </BtnGhost>
+              </div>
+            </Card>
+
+            <Card
+              title="Posture"
+              icon={ShieldCheck}
+              className="col-span-12 lg:col-span-4"
+            >
+              <div className="divide-y divide-border/60">
+                <div className="pk-kv"><span>Assurance level</span><span>aal2</span></div>
+                <div className="pk-kv"><span>Verified factors</span><span>1</span></div>
+                <div className="pk-kv"><span>Local unlock</span><span>Not configured</span></div>
+                <div className="pk-kv"><span>Last MFA refresh</span><span>13:18:04</span></div>
+                <div className="pk-kv"><span>Protected scope</span><span>Local secret vault</span></div>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     </AppShell>
   );
