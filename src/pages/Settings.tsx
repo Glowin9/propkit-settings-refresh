@@ -304,7 +304,8 @@ export default function Settings() {
           </div>
         )}
 
-        {/* Main grid */}
+        {/* Main grid — API tab */}
+        {tab === "api" && (
         <div className="grid grid-cols-12 gap-3">
           {/* LEFT (8 cols) */}
           <div className="col-span-12 lg:col-span-8 space-y-3">
