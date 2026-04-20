@@ -487,7 +487,8 @@ export default function Settings() {
 
           {/* RIGHT (4 cols) */}
           <div className="col-span-12 lg:col-span-4 space-y-3">
-
+            <Card
+              title="Proxy configuration"
               icon={Server}
               right={<span className="pk-chip">Not stored yet</span>}
             >
